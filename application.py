@@ -1,5 +1,7 @@
 from flask import *
 import numpy
+import requests
+from PIL import Image
 
 
 # from tensorflow.keras.preprocessing import image
@@ -51,8 +53,11 @@ def index():
 def food_identify():
     if request.method == 'POST':
         # Get the file from post request
-        f = request.files['img']
-        f.save("img.jpg")
+        #f = request.files['img']
+        f = request.get_json()
+        img_url = f["url"]
+        img = Image.open(requests.get(img_url, stream = True).raw)
+        img.save("img.jpg")
         # Make prediction
         result = classify("img.jpg")
         return result
@@ -62,8 +67,11 @@ def food_identify():
 @app.route('/menu', methods=['POST'])
 def menu_scan_api():
     if request.method == 'POST':
-        f = request.files['img']
-        f.save('img_menu.jpg')
+        #f = request.files['img']
+        f = request.get_json()
+        img_url = f["url"]
+        img = Image.open(requests.get(img_url, stream = True).raw)
+        img.save('img_menu.jpg')
         result = recognize_text('img_menu.jpg')
         return result
     return None
